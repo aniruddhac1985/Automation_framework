@@ -14,9 +14,11 @@ import io.cucumber.java.en.Then;
 
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -139,10 +141,10 @@ public class Test_Steps  {
     @Given("search for user id on page {string}")
     public void searchForUserIdOnPage(String endPoint) throws Exception {
         String userData = ReqresUserService.sendGetRequest(endPoint);
-        if(userData!=null){
+        if(userData!=null && !userData.isBlank() && !userData.isEmpty()){
             ExtentTestManager.logPass("User found : "+ userData);
         }else{
-            ExtentTestManager.logFail("User not found");
+            ExtentTestManager.logFail("User not found : "+ endPoint);
         }
 
     }
@@ -168,14 +170,12 @@ public class Test_Steps  {
 
     }
 
-
-
     public static class ReqresUserService extends BaseSteps {
 
         public static String BASE_URL = null;
         public static final String API_KEY = "reqres-free-v1";
         public HomePage home;
-
+        public static int responseCode=-1;
         protected Scenario scenario;
         static String scenarioName;
         static int x = 0;
@@ -201,6 +201,7 @@ public class Test_Steps  {
             if (scenario.isFailed()) {
                 ExtentTestManager.logFail("Scenario Failed");
                 ExtentTestManager.addScreenShotsOnFailure();
+                ExtentTestManager.scenarioFail();
             } else {
                 ExtentTestManager.scenarioPass();
             }
@@ -283,28 +284,45 @@ public class Test_Steps  {
         /**
          * Sends a GET request to Reqres API for a specific page and returns the response as String.
          */
-        public static String sendGetRequest(String endPoint) throws Exception {
-            URL url = new URL(BASE_URL + endPoint);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("x-api-key", API_KEY);
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("GET request failed for page " + (endPoint.split("="))[1] + ", Response Code: " + responseCode);
-            }
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        public static String sendGetRequest(String endPoint) {
+            URL url = null;
             StringBuilder responseBuilder = new StringBuilder();
             String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                responseBuilder.append(inputLine);
-            }
-            in.close();
+            try {
+                url = new URL(BASE_URL + endPoint);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("x-api-key", API_KEY);
 
-            return responseBuilder.toString();
+                responseCode = connection.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    ExtentTestManager.logFail("GET request failed for page " + endPoint + ", Response Code: " + responseCode);
+                }else{
+                    ExtentTestManager.logPass("GET request passed for page " + endPoint + ", Response Code: " + responseCode);
+                }
+                BufferedReader br=null;
+                if(responseCode >= 400){
+                    br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
+                }else {
+                    br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+                }
+
+                while ((inputLine = br.readLine()) != null) {
+                    responseBuilder.append(inputLine);
+                }
+                br.close();
+            }catch (IOException e){
+                e.printStackTrace();
+                log.info(e.getMessage());
+            }
+            if(responseBuilder.toString().equalsIgnoreCase("{}")) {
+                return "";
+            }else {
+                return responseBuilder.toString();
+            }
         }
 
+        git stat
 
     }
 }

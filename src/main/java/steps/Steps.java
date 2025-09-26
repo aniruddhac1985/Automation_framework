@@ -42,7 +42,7 @@ public class Steps extends BaseSteps {
 		if (scenario.isFailed()) {
 
 			ExtentTestManager.logFail("Scenario Failed");
-			ExtentTestManager.addScreenShotsOnFailure();
+	//		ExtentTestManager.addScreenShotsOnFailure();
 		} else {
 
 			ExtentTestManager.scenarioPass();

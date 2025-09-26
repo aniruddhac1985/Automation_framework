@@ -39,6 +39,15 @@ public class ExtentTestManager {
 	
 	}
 
+	public static void scenarioFail() {
+
+		String failLogg = "SCENARIO FAILED";
+		Markup m = MarkupHelper.createLabel(failLogg, ExtentColor.RED);
+		testReport.get().log(Status.FAIL, m);
+
+
+	}
+
 	public static void logFail(String message) {
 
 		testReport.get().fail(message);

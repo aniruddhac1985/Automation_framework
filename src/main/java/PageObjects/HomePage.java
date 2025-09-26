@@ -18,10 +18,10 @@ public class HomePage extends BasePage {
 		return (HomePage) openPage(HomePage.class);
 	}
 	
-	public ZohoLoginPage gotoLogin(){
+	public LoginPage gotoLogin(){
 		System.out.println("inside go to login");
 		click(logIn, "Login Link");
-		return (ZohoLoginPage) openPage(ZohoLoginPage.class);
+		return (LoginPage) openPage(LoginPage.class);
 			
 	}
 

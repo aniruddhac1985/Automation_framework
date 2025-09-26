@@ -36,36 +36,7 @@ public class AppPage extends BasePage{
 	}
 
 	
-	public Page gotoCRM() {
-		
-		click(crm,"CRM Link");
-		return (Page) openPage(Page.class);
-	}
-	
-	public ZohoCliqPage gotoCliq() {
-		
-		click(cliq,"Cliq Link");
-		return (ZohoCliqPage) openPage(ZohoCliqPage.class);
-	}
-	
-	public ZohoSubscriptionsPage gotoSubscriptions() {
-		
-		click(subscriptions,"Subscriptions Link");
-		return (ZohoSubscriptionsPage) openPage(ZohoSubscriptionsPage.class);
-	}
-	
-	public ZohoCreatorPage gotoCreator() {
-		
-		click(creator,"Creator Link");
-		return (ZohoCreatorPage) openPage(ZohoCreatorPage.class);
 
-	}
-	
-	public ZohoSalesIQPage gotoSalesIQ() {
-		
-		click(salesIQ,"SalesIQ Link");
-		return (ZohoSalesIQPage) openPage(ZohoSalesIQPage.class);
-	}
 	
 	
 	

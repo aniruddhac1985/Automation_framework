@@ -18,9 +18,49 @@ Feature: API test
       | id |
       | 3  |
 
+  Scenario Outline: Should see SINGLE USER data
+    Given search for user id on page "/api/users/<id>"
+#    Then the response status code should be "<Status>"
+#    And the response should contain the field "error"
+    Examples:
+      | id |
+      | 55 |
+
   Scenario Outline: Should see Specific USER data
     Given Search user data "<name>" and "<email>" on page "/api/users?page="
     Examples:
       | name | email               |
       | Emma | emma.wong@reqres.in |
 
+
+
+  Scenario Outline: Create a new user
+    Given the system is running and the Create User API is available
+    When I send a POST request to "/api/users" with the following details: "<name>" and "<job>"
+    Then the response status code should be "<status>"
+    And the response should contain the field "id"
+    And the response should contain the field "createdAt"
+    And the response field "name" should be "<name>"
+    And the response field "job" should be "<job>"
+    Examples:
+      | name | job |status|
+      | Peter | Manager |201|
+      | Liza | Sales |201   |
+
+
+  Scenario Outline: LOGIN - SUCCESSFUL by a user
+    Given I send POST request to "/api/login" login with the "<Email>" and "<Password>"
+    Then the response status code should be "<Status>"
+    And the response should contain the field "token"
+
+    Examples:
+      | Email                | Password   |Status|
+      | eve.holt@reqres.in   | cityslicka |200    |
+
+  Scenario Outline: LOGIN - UNSUCCESSFUL by a user
+    Given I send POST request to "/api/login" login with the "<Email>" and "<Password>"
+    Then the response status code should be "<Status>"
+    And the response should contain the field "error"
+    Examples:
+      | Email              | Password | Status |
+      | eve.holt@reqres.in |          | 400    |
