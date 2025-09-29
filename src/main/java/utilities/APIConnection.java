@@ -3,11 +3,12 @@ package utilities;
 import ExtentListeners.ExtentTestManager;
 import org.json.JSONObject;
 
-import static stepDefination.Test_Steps.ReqresUserService.BASE_URL;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import static stepDefination.ReqresUserService.BASE_URL;
 
 public class APIConnection {
     HttpURLConnection con = null;

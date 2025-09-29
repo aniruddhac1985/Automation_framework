@@ -1,45 +1,78 @@
 package PageObjects;
 
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class LoginPage extends BasePage {
 
-	@FindBy(xpath = "//*[@id='lid']")
-	public WebElement email;
+    // Login form elements
+    @FindBy(id = "user-name")
+    private WebElement usernameField;
 
-	@FindBy(xpath = "//*[@id='pwd']")
-	public WebElement pass;
+    @FindBy(id = "password")
+    private WebElement passwordField;
 
-	@FindBy(xpath = "//*[@id='signin_submit']")
-	public WebElement signin;
+    @FindBy(id = "login-button")
+    private WebElement loginButton;
 
-	public LoginPage doLoginAsInvalidUser(String username, String password) {
+    @FindBy(css = "[data-test='error']")
+    private WebElement errorMessage;
 
-		type(email, username, "Username textbox");
-		type(pass, password, "Password textbox");
-		click(signin, "Sign in Button");
+    // User credentials section
+    @FindBy(id = "login_credentials")
+    private WebElement acceptedUsernames;
 
-		return this;
+    @FindBy(className = "login_password")
+    private WebElement passwordInfo;
 
-	}
+    public LoginPage(WebDriver driver) {
+        super(driver);
+    }
 
-	public AppPage doLoginAsValidUser(String username, String password) {
+    public void enterUsername(String username) {
+        wait.until(ExpectedConditions.visibilityOf(usernameField)).clear();
+        usernameField.sendKeys(username);
+    }
 
-		type(email, username, "Username textbox");
-		type(pass, password, "Password textbox");
-		click(signin, "Sign in Button");
+    public void enterPassword(String password) {
+        wait.until(ExpectedConditions.visibilityOf(passwordField)).clear();
+        passwordField.sendKeys(password);
+    }
 
-		return (AppPage) openPage(AppPage.class);
+    public void clickLoginButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
+    }
 
-	}
+    public InventoryPage login(String username, String password) {
+        enterUsername(username);
+        enterPassword(password);
+        clickLoginButton();
+        return new InventoryPage(driver);
+    }
 
-	@Override
-	protected ExpectedCondition getPageLoadCondition() {
-		// TODO Auto-generated method stub
-		return ExpectedConditions.visibilityOf(email);
-	}
+    public String getErrorMessage() {
+        return wait.until(ExpectedConditions.visibilityOf(errorMessage)).getText();
+    }
 
+    public boolean isErrorMessageDisplayed() {
+        try {
+            return errorMessage.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getAcceptedUsernames() {
+        return acceptedUsernames.getText();
+    }
+
+    public String getPasswordInfo() {
+        return passwordInfo.getText();
+    }
+
+    public boolean isLoginPageLoaded() {
+        return wait.until(ExpectedConditions.visibilityOf(loginButton)).isDisplayed();
+    }
 }

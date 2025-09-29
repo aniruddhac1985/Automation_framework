@@ -7,10 +7,10 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         features = "src/resources/Features",
-        glue= {"src/test/java/stepDefination"},
+        glue= {"stepDefination"},
         plugin = {
                 "pretty",
-                "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:" // Initializes ExtentReports
+                "ExtentListeners/ExtentTestManager" // Initializes ExtentReports
         },
         monochrome = true,
         dryRun=false

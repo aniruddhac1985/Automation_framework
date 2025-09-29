@@ -1,61 +1,79 @@
 package PageObjects;
 
-import ExtentListeners.ExtentTestManager;
-import utilities.DriverManager;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
-import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.Duration;
 
-public abstract class BasePage<T> {
-	protected WebDriver driver;
-	  private long LOAD_TIMEOUT = 30;
-     private int AJAX_ELEMENT_TIMEOUT = 10;
-	    public BasePage() {
-	        this.driver = DriverManager.getDriver();
-	    }
-	    public T openPage(Class<T> clazz) {
-	        T page = null;
-	        try {
-	            driver = DriverManager.getDriver();
-	            AjaxElementLocatorFactory ajaxElemFactory = new AjaxElementLocatorFactory(driver, AJAX_ELEMENT_TIMEOUT);
-	            page = PageFactory.initElements(driver, clazz);
-	            PageFactory.initElements(ajaxElemFactory, page);
-	            ExpectedCondition pageLoadCondition = ((BasePage) page).getPageLoadCondition();
-	            waitForPageToLoad(pageLoadCondition);
-	        } catch (NoSuchElementException e) {
-	        /*    String error_screenshot = System.getProperty("user.dir") + "\\target\\screenshots\\" + clazz.getSimpleName() + "_error.png";
-	            this.takeScreenShot(error_screenshot);
-	     */       throw new IllegalStateException(String.format("This is not the %s page", clazz.getSimpleName()));
-	        }
-	        return page;
-	    }
+public class BasePage {
+    protected WebDriver driver;
+    protected WebDriverWait wait;
+    protected Wait fluentWait;
 
-	    private void waitForPageToLoad(ExpectedCondition pageLoadCondition) {
-	    	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(LOAD_TIMEOUT));
-	        wait.until(pageLoadCondition);
-	    }
+    // Common header elements
+    @FindBy(className = "app_logo")
+    protected WebElement appLogo;
 
-	    protected abstract ExpectedCondition getPageLoadCondition();
+    @FindBy(id = "react-burger-menu-btn")
+    protected WebElement hamburgerMenu;
 
-		
-		public void click(WebElement element, String elementName) {
-			
-			element.click();
-			ExtentTestManager.testReport.get().info("Clicking on : "+elementName);
-			
-		}
-		
-		public void type(WebElement element, String value, String elementName) {
-			
-			element.sendKeys(value);
-			ExtentTestManager.testReport.get().info("Typing in : "+elementName+" entered the value as : "+value);
-		
-		}
-	
+    @FindBy(className = "shopping_cart_link")
+    protected WebElement cartLink;
+
+    @FindBy(className = "shopping_cart_badge")
+    protected WebElement cartBadge;
+
+    @FindBy(id = "logout_sidebar_link")
+    protected WebElement logoutLink;
+
+    @FindBy(id = "about_sidebar_link")
+    protected WebElement aboutLink;
+
+    @FindBy(id = "reset_sidebar_link")
+    protected WebElement resetAppStateLink;
+
+    @FindBy(id = "inventory_sidebar_link")
+    protected WebElement allItemsLink;
+
+    public BasePage(WebDriver driver) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.fluentWait = new FluentWait(driver).withTimeout(Duration.ofSeconds(60)).ignoring(NoSuchElementException.class).pollingEvery(Duration.ofMillis(500));
+        PageFactory.initElements(driver, this);
+    }
+
+    public void clickHamburgerMenu() {
+        wait.until(ExpectedConditions.elementToBeClickable(hamburgerMenu)).click();
+    }
+
+    public void clickCart() {
+        wait.until(ExpectedConditions.elementToBeClickable(cartLink)).click();
+    }
+
+    public String getCartBadgeText() {
+        return wait.until(ExpectedConditions.visibilityOf(cartBadge)).getText();
+    }
+
+    public int getCartItemCount() {
+        try {
+            return Integer.parseInt(getCartBadgeText());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public void logout() {
+        clickHamburgerMenu();
+        wait.until(ExpectedConditions.elementToBeClickable(logoutLink)).click();
+    }
+
+    public String getAppTitle() {
+        return wait.until(ExpectedConditions.visibilityOf(appLogo)).getText();
+    }
 }

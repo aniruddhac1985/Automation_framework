@@ -14,17 +14,18 @@ Feature: API test
 
   Scenario Outline: Should see SINGLE USER data
     Given search for user id on page "/api/users/<id>"
+    When status is <status_code>
     Examples:
-      | id |
-      | 3  |
+      | id |status_code|
+      | 3  |200        |
 
   Scenario Outline: Should see SINGLE USER data
     Given search for user id on page "/api/users/<id>"
-#    Then the response status code should be "<Status>"
-#    And the response should contain the field "error"
+    When the response status code should be "<status_code>"
+    And the response should contain the field "error"
     Examples:
-      | id |
-      | 55 |
+      | id |status_code|error|
+      | 55 |404   |     |
 
   Scenario Outline: Should see Specific USER data
     Given Search user data "<name>" and "<email>" on page "/api/users?page="
@@ -52,7 +53,6 @@ Feature: API test
     Given I send POST request to "/api/login" login with the "<Email>" and "<Password>"
     Then the response status code should be "<Status>"
     And the response should contain the field "token"
-
     Examples:
       | Email                | Password   |Status|
       | eve.holt@reqres.in   | cityslicka |200    |
@@ -64,3 +64,8 @@ Feature: API test
     Examples:
       | Email              | Password | Status |
       | eve.holt@reqres.in |          | 400    |
+
+
+  Scenario: Should see the list of users with DELAYED RESPONSE
+    Given I send get request to "/api/users?delay=3" wait for the user list to load
+    Then I should see that every user has a unique id
