@@ -1,12 +1,11 @@
 package PageObjects;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.*;
 import utilities.Constants;
+
+import java.time.Duration;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -77,6 +76,7 @@ public class InventoryPage extends BasePage {
     // ========================
 
     /** List of add to cart buttons */
+//    @FindBy(css = "//div[contains(@class,'inventory_item')][.//div[contains(@class,'inventory_item_name') and text()='Sauce Labs Fleece Jacket']]//button[contains(@data-test,'add-to-cart')]")
     @FindBy(css = "button[id^='add-to-cart']")
     private List<WebElement> addToCartButtons;
 
@@ -286,20 +286,57 @@ public class InventoryPage extends BasePage {
      * @param itemName Name of the product to add
      * @return true if item was found and added, false otherwise
      */
+//    public boolean addItemToCartByName(String itemName) {
+//        List<String> names = getItemNames();
+//        int reducedAddCartBtnCount=0;
+//        for (int i = 0; i < names.size(); i++) {
+//            if (names.get(i).equals(itemName)) {
+//                if (i < addToCartButtons.size()) {
+//                    addToCartButtons.get(i).click();
+//                    WebElement addToCartButton=null;
+//                    try {
+//                        addToCartButton = driver.findElement(By.xpath("div[contains(@class,'inventory_item')][.//div[contains(@class,'inventory_item_name') and text()='" + itemName + "']]//button[contains(@data-test,'add-to-cart')]"));
+//                        if(addToCartButton!=null && addToCartButton.isDisplayed()){
+//                            addToCartButton.click();
+//                        }
+//                    }catch(NoSuchElementException e){
+//                        System.out.println(itemName+ " item is added to cart");
+//                    }catch(Exception e){
+//                        e.printStackTrace();
+//                    }
+//
+//                        return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
+
     public boolean addItemToCartByName(String itemName) {
-        List<String> names = getItemNames();
+                    WebElement addToCartButton=null;
+                    String idString= new String(itemName);
+                    idString=idString.replace(" ","-").toLowerCase();
+                    idString="add-to-cart-"+idString;
+                Wait<WebDriver> wait =new FluentWait<>(driver)
+                        .withTimeout(Duration.ofSeconds(2))
+                        .pollingEvery(Duration.ofMillis(300))
+                        .ignoring(ElementNotInteractableException.class);
+                    try {
+                        addToCartButton=driver.findElement(By.xpath(".//button[@id='"+idString+"']"));
+                       // addToCartButton = wait.until(driver,By.xpath();
+                        if(addToCartButton!=null && addToCartButton.isDisplayed()){
+                            addToCartButton.click();
+                        }
+                    }catch(NoSuchElementException e){
+                        e.printStackTrace();
+                        return false;
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        return false;
+                    }
 
-        for (int i = 0; i < names.size(); i++) {
-            if (names.get(i).equals(itemName)) {
-                if (i < addToCartButtons.size()) {
-                    addToCartButtons.get(i).click();
                     return true;
-                }
-            }
-        }
-        return false;
     }
-
     /**
      * Add item to cart by index
      * @param index Index of the product to add (0-based)
@@ -370,13 +407,20 @@ public class InventoryPage extends BasePage {
      * @return true if item is in cart, false otherwise
      */
     public boolean isItemInCart(String itemName) {
-        List<String> names = getItemNames();
 
-        for (int i = 0; i < names.size(); i++) {
-            if (names.get(i).equals(itemName)) {
-                return i < removeButtons.size() && removeButtons.get(i).isDisplayed();
-            }
+        WebElement addToCartButton=null;
+        String idString= new String(itemName);
+        idString=idString.replace(" ","-").toLowerCase();
+        idString="remove-"+idString;
+
+        try{
+        WebElement removeButton= driver.findElement(By.xpath(".//button[@id='"+idString+"']"));
+        if(removeButton!=null && removeButton.isEnabled())
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
         return false;
     }
 

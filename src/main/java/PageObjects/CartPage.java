@@ -277,12 +277,36 @@ public class CartPage extends BasePage {
 
         for (int i = 0; i < names.size(); i++) {
             if (names.get(i).equals(itemName)) {
-                removeButtons.get(i).click();
-                return true;
+                WebElement addToCartButton=null;
+                String idString= new String(itemName);
+                idString=idString.replace(" ","-").toLowerCase();
+                idString="remove-"+idString;
+
+                try{
+                    WebElement removeButton= driver.findElement(By.xpath(".//button[@id='"+idString+"']"));
+                    if(removeButton!=null && removeButton.isEnabled()){
+                        removeButton.click();
+                        return true;
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
             }
         }
         return false;
     }
+//    public boolean removeItemByName(String itemName) {
+//        List<String> names = getItemNames();
+//
+//        for (int i = 0; i < names.size(); i++) {
+//            if (names.get(i).equals(itemName)) {
+//                removeButtons.get(i).click();
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * Remove item from cart by index

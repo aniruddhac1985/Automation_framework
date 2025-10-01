@@ -100,7 +100,7 @@ public class DriverFactory {
         if (headless) {
             chromeOptions.addArguments("--headless");
         }
-
+        //chromeOptions.addArguments("--user-data-dir=/path/to/new/user/data/directory");
         // Additional options for CI/CD environments
         chromeOptions.addArguments("--remote-allow-origins=*");
         chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
